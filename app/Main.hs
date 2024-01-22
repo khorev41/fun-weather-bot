@@ -4,12 +4,12 @@
 
 module Main where
 
+import Control.Monad.IO.Class
 import Control.Applicative
 import WeatherApi as Api
 import ForecastApi as FApi
 import Data.Text (Text, pack)
 import qualified Data.Text as Text
-import System.IO.Unsafe (unsafePerformIO)
 
 import Telegram.Bot.API
 import Telegram.Bot.Simple
@@ -55,9 +55,11 @@ bot = BotApp
         reply (toReplyMessage startMessage)
           { replyMessageReplyMarkup = Just (SomeReplyKeyboardMarkup startKeyboard) }
       Weather city -> () <# do
-        replyText (getWeatherMessage city)
+        result <- liftIO (getWeatherMessage city)
+        replyText result
       ForecastAction city -> () <# do
-        replyText (getForecastMessage city)
+        result <- liftIO (getForecastMessage city)
+        replyText result
 
       where
       startMessage = Text.unlines
@@ -75,8 +77,6 @@ bot = BotApp
           , "Give it a try! Send me /weather city, and we'll see what's currently happening outside."
           ]
 
-
-
     startKeyboard :: ReplyKeyboardMarkup
     startKeyboard = ReplyKeyboardMarkup
       { replyKeyboardMarkupKeyboard =
@@ -90,8 +90,8 @@ bot = BotApp
       , replyKeyboardMarkupIsPersistent = Nothing
       }
 
-getWeatherMessage :: Text -> Text
-getWeatherMessage city = unsafePerformIO $ do
+getWeatherMessage :: Text -> IO Text
+getWeatherMessage city = do
     print city
     maybeWeatherData <- Api.getWeatherData city
     case maybeWeatherData of
@@ -106,8 +106,8 @@ getWeatherMessage city = unsafePerformIO $ do
         Nothing -> return "Error fetching weather data"
 
 
-getForecastMessage :: Text -> Text
-getForecastMessage city = unsafePerformIO $ do
+getForecastMessage :: Text -> IO Text
+getForecastMessage city = do
     print city
     maybeForecastData <- FApi.getForecastData city
     case maybeForecastData of
@@ -137,6 +137,6 @@ run token = do
 
 main :: IO ()
 main = do
-    let token = "6624143648:AAFpIQo8uIBzM4YT_TyqBSOhY34dB2g7Vy0"
+    let token = "YOUR_API_KEY"
     putStr "Bot is running"
     run token

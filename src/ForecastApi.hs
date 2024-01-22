@@ -132,7 +132,7 @@ instance FromJSON Day
 getForecastData :: Text -> IO (Maybe WeatherForecastData)
 getForecastData cityName = do
     manager <- newManager tlsManagerSettings
-    request <- parseRequest (replaceSpacesWithPercent ("https://api.weatherapi.com/v1/forecast.json?key=530a689cc2af4078933164514241501&q=" ++ unpack cityName ++ "&days=3" ))
+    request <- parseRequest (replaceSpacesWithPercent ("https://api.weatherapi.com/v1/forecast.json?key=<API_KEY>&q=" ++ unpack cityName ++ "&days=3" ))
     response <- httpLbs request manager
     let jsonString = LBS.unpack $ responseBody response
 

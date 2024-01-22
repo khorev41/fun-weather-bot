@@ -112,7 +112,7 @@ replaceSpacesWithPercent input = unpack $ replace (pack " ") (pack "%20") (pack 
 getWeatherData :: Text -> IO (Maybe WeatherData)
 getWeatherData cityName = do
     manager <- newManager tlsManagerSettings
-    request <- parseRequest (replaceSpacesWithPercent ("http://api.weatherapi.com/v1/current.json?key=530a689cc2af4078933164514241501&q=" ++ unpack cityName))
+    request <- parseRequest (replaceSpacesWithPercent ("http://api.weatherapi.com/v1/current.json?key=<API_KEY>&q=" ++ unpack cityName))
     response <- httpLbs request manager
     let jsonString = LBS.unpack $ responseBody response
     
